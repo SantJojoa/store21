@@ -1,0 +1,197 @@
+---
+import "../../styles/global.css";
+import Navbar from "../../components/Navbar.astro";
+import { supabase } from "../../lib/supabase";
+
+const { id } = Astro.params;
+
+const { data: product } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+if (!product) {
+    return new Response(null, { status: 404 });
+}
+
+const hasDiscount = product.discount_percentage > 0;
+
+const finalPrice = hasDiscount
+    ? product.price * (1 - product.discount_percentage / 100)
+    : product.price;
+
+const formatPrice = (value: number) =>
+    new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        maximumFractionDigits: 0,
+    }).format(value);
+
+const imageCount = product.image_urls.length;
+---
+
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <title>{product.name} | Store 21</title>
+    </head>
+    <body class="min-h-screen bg-black">
+        <Navbar />
+        <main
+            class="pt-28 max-w-6xl mx-auto px-6 pb-16 grid md:grid-cols-2 gap-12"
+        >
+            <div class="md:self-start">
+                {
+                    imageCount < 3 ? (
+                        <div class="flex flex-col gap-4">
+                            {product.image_urls.map((url: string) => (
+                                <div class="aspect-square rounded-xl overflow-hidden bg-white/5">
+                                    <img
+                                        src={url}
+                                        alt={product.name}
+                                        loading="eager"
+                                        class="product-image cursor-zoom-in h-full w-full object-cover"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div class="grid grid-cols-2 gap-4">
+                            {product.image_urls.map((url: string) => (
+                                <div class="aspect-square rounded-xl overflow-hidden bg-white/5">
+                                    <img
+                                        src={url}
+                                        alt={product.name}
+                                        loading="eager"
+                                        class="product-image cursor-zoom-in h-full w-full object-cover"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )
+                }
+            </div>
+
+            <div class="text-white md:sticky md:top-28 md:self-start">
+                <h1 class="text-3xl font-bold">{product.name}</h1>
+
+                <div class="mt-4 flex items-center gap-3">
+                    <span class="text-2xl font-semibold"
+                        >{formatPrice(finalPrice)}</span
+                    >
+                    {
+                        hasDiscount && (
+                            <>
+                                <span class="text-lg text-white/50 line-through">
+                                    {formatPrice(product.price)}
+                                </span>
+                                <span class="bg-white/10 border border-white/30 text-xs font-bold px-2 py-1 rounded">
+                                    -{product.discount_percentage}%
+                                </span>
+                            </>
+                        )
+                    }
+                </div>
+
+                <div class="mt-6">
+                    <p
+                        class="text-sm uppercase tracking-wide text-white/50 mb-2"
+                    >
+                        Tallas
+                    </p>
+                    <div class="flex gap-2">
+                        {
+                            product.sizes.map((size: string) => (
+                                <span class="border border-white/30 rounded px-3 py-2 text-sm">
+                                    {size}
+                                </span>
+                            ))
+                        }
+                    </div>
+                </div>
+
+                <button
+                    disabled
+                    class="mt-10 w-full bg-white/20 text-white/60 font-semibold py-4 rounded-full cursor-not-allowed"
+                >
+                    Comprar (Próximamente)
+                </button>
+
+                <div class="mt-6 space-y-2 text-sm text-white/70">
+                    <p>
+                        <span class="text-white font-medium"
+                            >Métodos de pago:</span
+                        > PAGO POR NEQUI
+                    </p>
+                    <p>
+                        <span class="text-white font-medium"
+                            >Tiempo de envío estimado:</span
+                        > 2-3 días hábiles
+                    </p>
+                    <p>
+                        <span class="text-white font-medium"
+                            >Precio de envío:</span
+                        > $20.900(ciudades principales)
+                    </p>
+                </div>
+
+                <div class="mt-10 border-t border-white/10 pt-6">
+                    <h2 class="text-lg font-semibold mb-2">
+                        Información del producto
+                    </h2>
+                    <p class="text-sm text-white/70 leading-relaxed">
+                        {product.description || "Sin descripción disponible."}
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <dialog
+            id="image-preview"
+            class="m-auto backdrop:bg-black/80 bg-transparent p-0 max-w-3xl w-full"
+        >
+            <div class="relative">
+                <button
+                    id="close-preview"
+                    class="absolute -top-10 right-0 text-white text-3xl leading-none"
+                    aria-label="Cerrar"
+                >
+                    &times;
+                </button>
+                <img
+                    id="preview-image"
+                    src=""
+                    alt=""
+                    class="w-full max-h-[85vh] object-contain rounded-xl cursor-zoom-out"
+                />
+            </div>
+        </dialog>
+
+        <script>
+            const dialog = document.getElementById(
+                "image-preview",
+            ) as HTMLDialogElement;
+            const previewImage = document.getElementById(
+                "preview-image",
+            ) as HTMLImageElement;
+            const closeButton = document.getElementById("close-preview");
+
+            document
+                .querySelectorAll<HTMLImageElement>(".product-image")
+                .forEach((img) => {
+                    img.addEventListener("click", () => {
+                        previewImage.src = img.src;
+                        previewImage.alt = img.alt;
+                        dialog.showModal();
+                    });
+                });
+
+            closeButton?.addEventListener("click", () => dialog.close());
+            dialog?.addEventListener("click", (event) => {
+                if (event.target === dialog) dialog.close();
+            });
+            previewImage.addEventListener("click", () => dialog.close());
+        </script>
+    </body>
+</html>

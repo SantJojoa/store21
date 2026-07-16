@@ -1,7 +1,21 @@
 ---
+import "../styles/global.css";
 import Navbar from "../components/Navbar.astro";
 import Hero from "../components/Hero.astro";
-import "../styles/global.css";
+import ProductCard from "../components/ProductCard.astro";
+import { supabase } from "../lib/supabase";
+
+const { data: allProducts } = await supabase.from("products").select("*");
+
+function shuffle<T>(array: T[]): T[] {
+	const result = [...array];
+	for (let i = result.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[result[i], result[j]] = [result[j], result[i]];
+	}
+	return result;
+}
+const randomProducts = allProducts ? shuffle(allProducts).slice(0, 6) : [];
 ---
 
 <!doctype html>
@@ -14,8 +28,23 @@ import "../styles/global.css";
 		<meta name="generator" content={Astro.generator} />
 		<title>Store 21</title>
 	</head>
-	<body>
+	<body class="bg-black">
 		<Navbar />
 		<Hero />
+
+		<section id="productos" class="max-w-6xl mx-auto px-6 py-20">
+			<h2
+				class="text-2xl font-bold text-white text-center mb-10 uppercase tracking-wide"
+			>
+				Descubre nuestros productos
+			</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+				{
+					randomProducts.map((product) => (
+						<ProductCard product={product} />
+					))
+				}
+			</div>
+		</section>
 	</body>
 </html>
