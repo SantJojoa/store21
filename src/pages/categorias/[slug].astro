@@ -1,0 +1,69 @@
+---
+import Navbar from "../../components/Navbar.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import { supabase } from "../../lib/supabase";
+import "../../styles/global.css";
+
+const { slug } = Astro.params;
+
+const { data: category } = await supabase
+    .from("categories")
+    .select("id, name, background_image")
+    .eq("slug", slug)
+    .single();
+
+if (!category) {
+    return new Response(null, {
+        status: 404,
+        statusText: "Not Found",
+    });
+}
+const backgroundImage = category.background_image || "/backgroud.jpg";
+
+const { data: products } = await supabase
+    .from("products")
+    .select("*")
+    .eq("category_id", category.id);
+---
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <title>{category.name}</title>
+    </head>
+
+    <body
+        class="relative min-h-screen bg-cover bg-center bg-fixed"
+        style={`background-image: url('${backgroundImage}')`}
+    >
+        <div class="absolute inset-0 bg-black/60"></div>
+
+        <div class="relative z-10">
+            <Navbar />
+            <main class="pt-28 max-w-6xl mx-auto px-6 pb-16">
+                <header class="mb-10 text-center">
+                    <p
+                        class="text-xs uppercase tracking-[0.3em] text-white/50 mb-2"
+                    >
+                        Colección
+                    </p>
+                    <h1
+                        class="text-4xl md:text-5xl font-bold uppercase tracking-wide text-white"
+                    >
+                        {category.name}
+                    </h1>
+                    <div class="mt-4 mx-auto h-px w-16 bg-white/30"></div>
+                </header>
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
+                >
+                    {
+                        products?.map((product) => (
+                            <ProductCard product={product} />
+                        ))
+                    }
+                </div>
+            </main>
+        </div>
+    </body>
+</html>
