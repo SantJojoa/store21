@@ -33,11 +33,17 @@ const randomProducts = allProducts ? shuffle(allProducts).slice(0, 6) : [];
 		<Hero />
 
 		<section id="productos" class="max-w-6xl mx-auto px-6 py-20">
-			<h2
-				class="text-2xl font-bold text-white text-center mb-10 uppercase tracking-wide"
-			>
-				Descubre nuestros productos
-			</h2>
+			<div class="text-center mb-10">
+				<p class="text-xs uppercase tracking-[0.3em] text-orange-500 mb-2">
+					Catálogo
+				</p>
+				<h2
+					class="text-4xl md:text-5xl font-['Anton'] text-white uppercase tracking-wide"
+				>
+					Descubre nuestros productos
+				</h2>
+				<div class="mt-4 mx-auto h-1 w-16 bg-orange-500"></div>
+			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 				{
 					randomProducts.map((product) => (

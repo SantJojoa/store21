@@ -34,6 +34,7 @@ const imageCount = product.image_urls.length;
 <html lang="es">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
         <title>{product.name} | Store 21</title>
     </head>
     <body class="min-h-screen bg-black">
@@ -74,7 +75,7 @@ const imageCount = product.image_urls.length;
             </div>
 
             <div class="text-white md:sticky md:top-28 md:self-start">
-                <h1 class="text-3xl font-bold">{product.name}</h1>
+                <h1 class="text-4xl font-['Anton'] uppercase tracking-wide">{product.name}</h1>
 
                 <div class="mt-4 flex items-center gap-3">
                     <span class="text-2xl font-semibold"
@@ -86,7 +87,7 @@ const imageCount = product.image_urls.length;
                                 <span class="text-lg text-white/50 line-through">
                                     {formatPrice(product.price)}
                                 </span>
-                                <span class="bg-white/10 border border-white/30 text-xs font-bold px-2 py-1 rounded">
+                                <span class="bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded">
                                     -{product.discount_percentage}%
                                 </span>
                             </>
@@ -96,7 +97,7 @@ const imageCount = product.image_urls.length;
 
                 <div class="mt-6">
                     <p
-                        class="text-sm uppercase tracking-wide text-white/50 mb-2"
+                        class="text-sm uppercase tracking-wide text-orange-500/80 mb-2"
                     >
                         Tallas
                     </p>
@@ -106,7 +107,7 @@ const imageCount = product.image_urls.length;
                                 <button
                                     type="button"
                                     data-size={size}
-                                    class="size-option border border-white/30 rounded px-3 py-2 text-sm text-white/80 hover:border-white transition-colors"
+                                    class="size-option border border-white/30 rounded px-3 py-2 text-sm text-white/80 hover:border-orange-500 transition-colors active:scale-95"
                                 >
                                     {size}
                                 </button>
@@ -117,7 +118,7 @@ const imageCount = product.image_urls.length;
 
                 <div class="mt-6">
                     <p
-                        class="text-sm uppercase tracking-wide text-white/50 mb-2"
+                        class="text-sm uppercase tracking-wide text-orange-500/80 mb-2"
                     >
                         Cantidad
                     </p>
@@ -125,7 +126,7 @@ const imageCount = product.image_urls.length;
                         <button
                             id="qty-decrease"
                             type="button"
-                            class="h-9 w-9 border border-white/30 rounded text-white hover:border-white"
+                            class="h-9 w-9 border border-white/30 rounded text-white hover:border-orange-500 transition-colors active:scale-95"
                             >-</button
                         >
                         <span id="qty-value" class="w-8 text-center text-white"
@@ -134,7 +135,7 @@ const imageCount = product.image_urls.length;
                         <button
                             id="qty-increase"
                             type="button"
-                            class="h-9 w-9 border border-white/30 rounded text-white hover:border-white"
+                            class="h-9 w-9 border border-white/30 rounded text-white hover:border-orange-500 transition-colors active:scale-95"
                             >+</button
                         >
                     </div>
@@ -146,7 +147,7 @@ const imageCount = product.image_urls.length;
                     data-product-name={product.name}
                     data-price={finalPrice}
                     data-image={product.image_urls[0]}
-                    class="mt-10 w-full bg-white text-black font-semibold py-4 rounded-full hover:bg-white/90 transition-colors"
+                    class="mt-10 w-full bg-orange-600 text-white font-semibold py-4 rounded-full hover:bg-orange-500 transition-colors active:scale-[0.98]"
                 >
                     Agregar al carrito
                 </button>
@@ -243,9 +244,9 @@ const imageCount = product.image_urls.length;
                 button.addEventListener("click", () => {
                     selectedSize = button.dataset.size ?? null;
                     sizeButtons.forEach((b) =>
-                        b.classList.remove("border-white", "bg-white/10"),
+                        b.classList.remove("border-orange-500", "bg-orange-500/10"),
                     );
-                    button.classList.add("border-white", "bg-white/10");
+                    button.classList.add("border-orange-500", "bg-orange-500/10");
                 });
             });
 

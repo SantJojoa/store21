@@ -29,6 +29,7 @@ const { data: products } = await supabase
 <html lang="es">
     <head>
         <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
         <title>{category.name}</title>
     </head>
 
@@ -43,16 +44,16 @@ const { data: products } = await supabase
             <main class="pt-28 max-w-6xl mx-auto px-6 pb-16">
                 <header class="mb-10 text-center">
                     <p
-                        class="text-xs uppercase tracking-[0.3em] text-white/50 mb-2"
+                        class="text-xs uppercase tracking-[0.3em] text-orange-500 mb-2"
                     >
                         Colección
                     </p>
                     <h1
-                        class="text-4xl md:text-5xl font-bold uppercase tracking-wide text-white"
+                        class="text-5xl md:text-6xl font-['Anton'] uppercase tracking-wide text-white"
                     >
                         {category.name}
                     </h1>
-                    <div class="mt-4 mx-auto h-px w-16 bg-white/30"></div>
+                    <div class="mt-4 mx-auto h-1 w-16 bg-orange-500"></div>
                 </header>
                 <div
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
