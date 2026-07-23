@@ -1,25 +1,67 @@
 <section
     id="inicio"
-    class="relative h-screen w-full bg-[url('/backgroud.jpg')] bg-cover bg-center bg-no-repeat flex items-center justify-center overflow-hidden"
+    class="relative min-h-[100dvh] w-full bg-[url('/backgroud.jpg')] bg-cover bg-center bg-no-repeat flex items-center overflow-hidden"
 >
-    <div class="absolute inset-0 bg-black/40"></div>
+    <div class="absolute inset-0 bg-black/55"></div>
+    <div
+        class="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/80"
+    >
+    </div>
+    <div
+        class="absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_22%_45%,rgba(0,0,0,0.55),transparent_70%)]"
+    >
+    </div>
+
+    <div
+        class="hidden lg:block absolute right-0 bottom-0 h-[90%] w-[60vw] max-w-full bg-[radial-gradient(ellipse_70%_80%_at_70%_100%,rgba(0,0,0,0.6),transparent_70%)]"
+        aria-hidden="true"
+    >
+    </div>
 
     <img
         src="/pet-nobg.png"
         alt="Mascota de Store 21"
-        class="hidden md:block absolute left-0 md:left-4 lg:left-12 bottom-0 z-10 h-[75%] lg:h-[85%] w-auto object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)]"
+        class="hidden lg:block absolute right-0 lg:right-6 bottom-0 z-10 h-[78%] xl:h-[92%] w-auto object-contain object-bottom drop-shadow-[0_30px_50px_rgba(0,0,0,0.75)] pointer-events-none"
     />
 
-    <div class="relative z-20 max-w-2xl mx-auto text-center text-white px-4">
-        <h1
-            class="font-['UnifrakturMaguntia'] text-5xl md:text-7xl font-bold tracking-tight leading-tight text-[#d4af37] drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]"
+    <div class="relative z-20 max-w-6xl mx-auto w-full px-6 lg:px-10 py-24">
+        <div
+            class="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] items-center gap-12"
         >
-            Bienvenido a Store 21
-        </h1>
-        <p
-            class="mt-6 text-2xl md:text-4xl text-[#d4af37]/90 tracking-wide leading-relaxed drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] font-[Pinyon_Script]"
-        >
-            Las mejores prendas de la ciudad
-        </p>
+            <div class="text-left">
+                <p
+                    class="text-xs uppercase tracking-[0.3em] text-red-600 mb-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+                >
+                    Streetwear original
+                </p>
+                <h1
+                    class="hero-title-3d font-['Anton'] uppercase text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight"
+                >
+                    STORE <span class="text-red-600">21</span>
+                </h1>
+                <p
+                    class="mt-6 text-white/90 text-lg md:text-xl leading-relaxed max-w-md drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]"
+                >
+                    Camisetas, gorras y busos con el sello de la calle. Nuevo
+                    drop cada semana.
+                </p>
+                <div class="mt-9 flex flex-wrap items-center gap-4">
+                    <a
+                        href="#productos"
+                        class="inline-flex items-center justify-center rounded-full bg-red-600 text-black font-semibold px-8 py-4 hover:bg-red-500 transition-colors active:scale-[0.98] shadow-[0_10px_30px_-8px_rgba(0,0,0,0.8)]"
+                    >
+                        Ver catálogo
+                    </a>
+                </div>
+            </div>
+
+            <div class="hidden md:flex lg:hidden justify-center">
+                <img
+                    src="/pet-nobg.png"
+                    alt="Mascota de Store 21"
+                    class="h-[320px] w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)]"
+                />
+            </div>
+        </div>
     </div>
 </section>
