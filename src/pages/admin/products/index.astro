@@ -1,0 +1,178 @@
+---
+import AdminHeader from "../../../components/AdminHeader.astro";
+import "../../../styles/global.css";
+---
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>Productos | Admin Store 21</title>
+    </head>
+
+    <body class="min-h-screen bg-black">
+        <AdminHeader active="products" />
+
+        <main class="max-w-6xl mx-auto px-6 py-10">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl font-['Anton'] uppercase text-white">
+                    Productos
+                </h1>
+                <a
+                    href="/admin/products/new"
+                    class="bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-orange-500 transition-colors"
+                >
+                    + Nuevo producto
+                </a>
+            </div>
+
+            <p id="products-status" class="text-sm text-white/50">
+                Cargando productos...
+            </p>
+
+            <div id="products-table-wrap" class="hidden overflow-x-auto">
+                <table class="w-full text-left text-sm text-white">
+                    <thead>
+                        <tr class="border-b border-white/10 text-white/50 uppercase text-xs tracking-wide">
+                            <th class="py-3 pr-4">Producto</th>
+                            <th class="py-3 pr-4">Categoría</th>
+                            <th class="py-3 pr-4">Precio</th>
+                            <th class="py-3 pr-4 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-body" class="divide-y divide-white/10">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <script>
+            import { supabase } from "../../../lib/supabaseClient";
+
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (!session) {
+                window.location.href = "/admin/login";
+                throw new Error("No session");
+            }
+
+            const statusEl = document.getElementById("products-status");
+            const tableWrap = document.getElementById("products-table-wrap");
+            const tbody = document.getElementById("products-body");
+
+            const formatPrice = (value: number) =>
+                new Intl.NumberFormat("es-CO", {
+                    style: "currency",
+                    currency: "COP",
+                    maximumFractionDigits: 0,
+                }).format(value);
+
+            const STORAGE_PREFIX = `${import.meta.env.PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/`;
+
+            function storagePathFromUrl(url: string): string | null {
+                return url.startsWith(STORAGE_PREFIX)
+                    ? url.slice(STORAGE_PREFIX.length)
+                    : null;
+            }
+
+            const { data: categories } = await supabase
+                .from("categories")
+                .select("id, name, parent_id");
+
+            const categoryById = new Map(
+                (categories ?? []).map((c) => [c.id, c]),
+            );
+
+            function categoryLabel(categoryId: string): string {
+                const category = categoryById.get(categoryId);
+                if (!category) return "—";
+                if (category.parent_id) {
+                    const parent = categoryById.get(category.parent_id);
+                    return parent
+                        ? `${parent.name} / ${category.name}`
+                        : category.name;
+                }
+                return category.name;
+            }
+
+            const { data: products, error } = await supabase
+                .from("products")
+                .select(
+                    "id, name, price, discount_percentage, category_id, image_urls",
+                )
+                .order("created_at", { ascending: false });
+
+            if (error || !products) {
+                if (statusEl)
+                    statusEl.textContent =
+                        "No se pudieron cargar los productos.";
+            } else if (products.length === 0) {
+                if (statusEl)
+                    statusEl.textContent = "Todavía no hay productos.";
+            } else {
+                statusEl?.classList.add("hidden");
+                tableWrap?.classList.remove("hidden");
+
+                for (const product of products) {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td class="py-3 pr-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${product.image_urls?.[0] ?? ""}" alt="${product.name}" class="h-12 w-12 rounded object-cover bg-white/5" />
+                                <span class="font-medium">${product.name}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 pr-4 text-white/70">${categoryLabel(product.category_id)}</td>
+                        <td class="py-3 pr-4 text-white/70">${formatPrice(product.price)}</td>
+                        <td class="py-3 pr-4 text-right whitespace-nowrap">
+                            <a href="/admin/products/${product.id}/edit" class="text-orange-500 hover:text-orange-400 text-sm mr-4">Editar</a>
+                            <button data-id="${product.id}" data-images='${JSON.stringify(product.image_urls ?? [])}' class="delete-btn text-red-400 hover:text-red-300 text-sm">Eliminar</button>
+                        </td>
+                    `;
+                    tbody?.appendChild(row);
+                }
+
+                tbody?.addEventListener("click", async (event) => {
+                    const target = event.target as HTMLElement;
+                    if (!target.classList.contains("delete-btn")) return;
+
+                    const id = target.dataset.id!;
+                    const images: string[] = JSON.parse(
+                        target.dataset.images ?? "[]",
+                    );
+
+                    if (!confirm("¿Eliminar este producto?")) return;
+
+                    target.setAttribute("disabled", "true");
+                    target.textContent = "Eliminando...";
+
+                    const paths = images
+                        .map(storagePathFromUrl)
+                        .filter((p): p is string => Boolean(p));
+
+                    if (paths.length > 0) {
+                        await supabase.storage
+                            .from("product-images")
+                            .remove(paths);
+                    }
+
+                    const { error: deleteError } = await supabase
+                        .from("products")
+                        .delete()
+                        .eq("id", id);
+
+                    if (deleteError) {
+                        alert("No se pudo eliminar el producto.");
+                        target.removeAttribute("disabled");
+                        target.textContent = "Eliminar";
+                        return;
+                    }
+
+                    target.closest("tr")?.remove();
+                });
+            }
+        </script>
+    </body>
+</html>

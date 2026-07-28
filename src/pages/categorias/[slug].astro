@@ -8,7 +8,7 @@ const { slug } = Astro.params;
 
 const { data: category } = await supabase
     .from("categories")
-    .select("id, name, background_image")
+    .select("id, name, slug, background_image, parent_id")
     .eq("slug", slug)
     .single();
 
@@ -18,12 +18,42 @@ if (!category) {
         statusText: "Not Found",
     });
 }
+
 const backgroundImage = category.background_image || "/backgroud.jpg";
+
+const [{ data: parent }, { data: children }, { data: siblings }] =
+    await Promise.all([
+        category.parent_id
+            ? supabase
+                  .from("categories")
+                  .select("id, name, slug")
+                  .eq("id", category.parent_id)
+                  .single()
+            : Promise.resolve({ data: null }),
+        supabase
+            .from("categories")
+            .select("id, name, slug")
+            .eq("parent_id", category.id)
+            .order("name"),
+        category.parent_id
+            ? supabase
+                  .from("categories")
+                  .select("id, name, slug")
+                  .eq("parent_id", category.parent_id)
+                  .neq("id", category.id)
+                  .order("name")
+            : Promise.resolve({ data: [] }),
+    ]);
+
+const categoryIds = [category.id, ...(children ?? []).map((c) => c.id)];
 
 const { data: products } = await supabase
     .from("products")
     .select("*")
-    .eq("category_id", category.id);
+    .in("category_id", categoryIds)
+    .order("created_at", { ascending: false });
+
+const productCount = products?.length ?? 0;
 ---
 
 <html lang="es">
@@ -37,11 +67,35 @@ const { data: products } = await supabase
         class="relative min-h-screen bg-cover bg-center bg-fixed"
         style={`background-image: url('${backgroundImage}')`}
     >
-        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="absolute inset-0 bg-black/70"></div>
 
         <div class="relative z-10">
             <Navbar />
             <main class="pt-28 max-w-6xl mx-auto px-6 pb-16">
+                <nav
+                    class="flex items-center gap-2 text-xs uppercase tracking-wider text-white/50 mb-6"
+                    aria-label="Breadcrumb"
+                >
+                    <a href="/" class="hover:text-white transition-colors"
+                        >Inicio</a
+                    >
+                    {
+                        parent && (
+                            <>
+                                <span aria-hidden="true">/</span>
+                                <a
+                                    href={`/categorias/${parent.slug}`}
+                                    class="hover:text-white transition-colors"
+                                >
+                                    {parent.name}
+                                </a>
+                            </>
+                        )
+                    }
+                    <span aria-hidden="true">/</span>
+                    <span class="text-white/80">{category.name}</span>
+                </nav>
+
                 <header class="mb-10 text-center">
                     <p
                         class="text-xs uppercase tracking-[0.3em] text-orange-500 mb-2"
@@ -54,16 +108,77 @@ const { data: products } = await supabase
                         {category.name}
                     </h1>
                     <div class="mt-4 mx-auto h-1 w-16 bg-orange-500"></div>
+                    <p class="mt-4 text-sm text-white/50">
+                        {
+                            productCount === 0
+                                ? "Sin productos"
+                                : productCount === 1
+                                  ? "1 producto"
+                                  : `${productCount} productos`
+                        }
+                    </p>
                 </header>
-                <div
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
-                >
-                    {
-                        products?.map((product) => (
-                            <ProductCard product={product} />
-                        ))
-                    }
-                </div>
+
+                {
+                    children && children.length > 0 && (
+                        <div class="mb-12 flex flex-wrap justify-center gap-3">
+                            {children.map((child) => (
+                                <a
+                                    href={`/categorias/${child.slug}`}
+                                    class="rounded-full border border-white/20 bg-white/10 backdrop-blur-md px-5 py-2 text-sm uppercase tracking-wide text-white/90 hover:border-orange-500 hover:text-white transition-colors"
+                                >
+                                    {child.name}
+                                </a>
+                            ))}
+                        </div>
+                    )
+                }
+
+                {
+                    siblings && siblings.length > 0 && (
+                        <div class="mb-12 flex flex-wrap justify-center gap-3">
+                            {parent && (
+                                <a
+                                    href={`/categorias/${parent.slug}`}
+                                    class="rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm uppercase tracking-wide text-white/70 hover:border-orange-500 hover:text-white transition-colors"
+                                >
+                                    Todo {parent.name}
+                                </a>
+                            )}
+                            <span class="rounded-full border border-orange-500 bg-orange-500/10 px-5 py-2 text-sm uppercase tracking-wide text-white">
+                                {category.name}
+                            </span>
+                            {siblings.map((sibling) => (
+                                <a
+                                    href={`/categorias/${sibling.slug}`}
+                                    class="rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm uppercase tracking-wide text-white/70 hover:border-orange-500 hover:text-white transition-colors"
+                                >
+                                    {sibling.name}
+                                </a>
+                            ))}
+                        </div>
+                    )
+                }
+
+                {
+                    productCount === 0 ? (
+                        <div class="flex flex-col items-center justify-center py-24 text-center">
+                            <p class="text-lg text-white/70">
+                                Todavía no hay productos en esta colección.
+                            </p>
+                            <p class="mt-2 text-sm text-white/40">
+                                Vuelve pronto, estamos preparando nuevo
+                                catálogo.
+                            </p>
+                        </div>
+                    ) : (
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                            {products?.map((product) => (
+                                <ProductCard product={product} />
+                            ))}
+                        </div>
+                    )
+                }
             </main>
         </div>
     </body>

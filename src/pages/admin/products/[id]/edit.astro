@@ -1,0 +1,419 @@
+---
+import AdminHeader from "../../../../components/AdminHeader.astro";
+import { supabase } from "../../../../lib/supabase";
+import "../../../../styles/global.css";
+
+const { id } = Astro.params;
+
+const { data: allCategories } = await supabase
+    .from("categories")
+    .select("id, name, slug, parent_id")
+    .order("name");
+
+const parents = (allCategories ?? []).filter((c) => !c.parent_id);
+const childrenByParent = new Map<
+    string,
+    NonNullable<typeof allCategories>
+>();
+for (const c of allCategories ?? []) {
+    if (c.parent_id) {
+        if (!childrenByParent.has(c.parent_id))
+            childrenByParent.set(c.parent_id, []);
+        childrenByParent.get(c.parent_id)!.push(c);
+    }
+}
+---
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>Editar producto | Admin Store 21</title>
+    </head>
+
+    <body class="min-h-screen bg-black">
+        <AdminHeader />
+
+        <main class="max-w-2xl mx-auto px-6 py-10">
+            <h1 class="text-2xl font-['Anton'] uppercase text-white mb-6">
+                Editar producto
+            </h1>
+
+            <p id="load-status" class="text-sm text-white/50">
+                Cargando producto...
+            </p>
+
+            <form
+                id="product-form"
+                data-product-id={id}
+                class="hidden space-y-5"
+            >
+                <div>
+                    <label
+                        for="name"
+                        class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                        >Nombre</label
+                    >
+                    <input
+                        id="name"
+                        required
+                        class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                    />
+                </div>
+
+                <div>
+                    <label
+                        for="description"
+                        class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                        >Descripción</label
+                    >
+                    <textarea
+                        id="description"
+                        rows="4"
+                        class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                    ></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label
+                            for="price"
+                            class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                            >Precio (COP)</label
+                        >
+                        <input
+                            id="price"
+                            type="number"
+                            min="0"
+                            required
+                            class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                        />
+                    </div>
+                    <div>
+                        <label
+                            for="discount"
+                            class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                            >Descuento % (opcional)</label
+                        >
+                        <input
+                            id="discount"
+                            type="number"
+                            min="0"
+                            max="100"
+                            class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        for="category"
+                        class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                        >Categoría</label
+                    >
+                    <select
+                        id="category"
+                        required
+                        class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500"
+                    >
+                        {
+                            parents.map((parent) => {
+                                const children =
+                                    childrenByParent.get(parent.id) ?? [];
+                                return children.length > 0 ? (
+                                    <optgroup
+                                        label={parent.name}
+                                        class="bg-black text-white"
+                                    >
+                                        {children.map((child) => (
+                                            <option
+                                                value={child.id}
+                                                data-slug={child.slug}
+                                                class="bg-black text-white"
+                                            >
+                                                {child.name}
+                                            </option>
+                                        ))}
+                                    </optgroup>
+                                ) : (
+                                    <option
+                                        value={parent.id}
+                                        data-slug={parent.slug}
+                                        class="bg-black text-white"
+                                    >
+                                        {parent.name}
+                                    </option>
+                                );
+                            })
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label
+                        for="sizes"
+                        class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                        >Tallas (separadas por coma)</label
+                    >
+                    <input
+                        id="sizes"
+                        placeholder="S, M, L, XL"
+                        class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                    />
+                </div>
+
+                <div>
+                    <p
+                        class="block text-xs uppercase tracking-wide text-white/50 mb-2"
+                    >
+                        Imágenes actuales
+                    </p>
+                    <div
+                        id="current-images"
+                        class="flex flex-wrap gap-3 mb-3"
+                    >
+                    </div>
+
+                    <label
+                        for="images"
+                        class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                        >Agregar imágenes nuevas</label
+                    >
+                    <input
+                        id="images"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        class="w-full text-sm text-white/70 file:mr-4 file:rounded-full file:border-0 file:bg-orange-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-orange-500"
+                    />
+                </div>
+
+                <p
+                    id="form-status"
+                    class="text-sm text-white/60 opacity-0 transition-opacity duration-300"
+                >
+                </p>
+
+                <button
+                    id="submit-btn"
+                    type="submit"
+                    class="w-full bg-orange-600 text-white font-semibold py-3 rounded-full hover:bg-orange-500 transition-colors active:scale-[0.98] disabled:opacity-50"
+                >
+                    Guardar cambios
+                </button>
+            </form>
+        </main>
+
+        <script>
+            import { supabase } from "../../../../lib/supabaseClient";
+
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (!session) {
+                window.location.href = "/admin/login";
+                throw new Error("No session");
+            }
+
+            const loadStatus = document.getElementById("load-status")!;
+            const form = document.getElementById(
+                "product-form",
+            ) as HTMLFormElement;
+            const productId = form.dataset.productId!;
+
+            const { data: product, error: fetchError } = await supabase
+                .from("products")
+                .select("*")
+                .eq("id", productId)
+                .single();
+
+            if (fetchError || !product) {
+                loadStatus.textContent = "No se encontró el producto.";
+                throw new Error("Product not found");
+            }
+
+            loadStatus.classList.add("hidden");
+            form.classList.remove("hidden");
+
+            (document.getElementById("name") as HTMLInputElement).value =
+                product.name;
+            (
+                document.getElementById(
+                    "description",
+                ) as HTMLTextAreaElement
+            ).value = product.description ?? "";
+            (document.getElementById("price") as HTMLInputElement).value =
+                String(product.price);
+            (document.getElementById("discount") as HTMLInputElement).value =
+                product.discount_percentage != null
+                    ? String(product.discount_percentage)
+                    : "";
+            (document.getElementById("category") as HTMLSelectElement).value =
+                product.category_id;
+            (document.getElementById("sizes") as HTMLInputElement).value = (
+                product.sizes ?? []
+            ).join(", ");
+
+            let currentImages: string[] = [...(product.image_urls ?? [])];
+            const currentImagesEl = document.getElementById(
+                "current-images",
+            )!;
+
+            function renderCurrentImages() {
+                currentImagesEl.innerHTML = "";
+                currentImages.forEach((url, index) => {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "relative";
+                    wrapper.innerHTML = `
+                        <img src="${url}" class="h-20 w-20 rounded object-cover bg-white/5" />
+                        <button type="button" data-index="${index}" class="remove-image absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white text-xs leading-none hover:bg-red-400">&times;</button>
+                    `;
+                    currentImagesEl.appendChild(wrapper);
+                });
+            }
+
+            renderCurrentImages();
+
+            const removedImageUrls: string[] = [];
+
+            currentImagesEl.addEventListener("click", (event) => {
+                const target = event.target as HTMLElement;
+                if (!target.classList.contains("remove-image")) return;
+                const index = Number(target.dataset.index);
+                removedImageUrls.push(currentImages[index]);
+                currentImages = currentImages.filter((_, i) => i !== index);
+                renderCurrentImages();
+            });
+
+            const STORAGE_PREFIX = `${import.meta.env.PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/`;
+
+            function storagePathFromUrl(url: string): string | null {
+                return url.startsWith(STORAGE_PREFIX)
+                    ? url.slice(STORAGE_PREFIX.length)
+                    : null;
+            }
+
+            const statusEl = document.getElementById("form-status")!;
+            const submitBtn = document.getElementById(
+                "submit-btn",
+            ) as HTMLButtonElement;
+
+            function showStatus(message: string) {
+                statusEl.textContent = message;
+                statusEl.classList.remove("opacity-0");
+            }
+
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                submitBtn.disabled = true;
+
+                const name = (
+                    document.getElementById("name") as HTMLInputElement
+                ).value.trim();
+                const description = (
+                    document.getElementById(
+                        "description",
+                    ) as HTMLTextAreaElement
+                ).value.trim();
+                const price = Number(
+                    (document.getElementById("price") as HTMLInputElement)
+                        .value,
+                );
+                const discountRaw = (
+                    document.getElementById("discount") as HTMLInputElement
+                ).value.trim();
+                const discount_percentage = discountRaw
+                    ? Number(discountRaw)
+                    : null;
+                const categorySelect = document.getElementById(
+                    "category",
+                ) as HTMLSelectElement;
+                const category_id = categorySelect.value;
+                const categorySlug =
+                    categorySelect.selectedOptions[0]?.dataset.slug ??
+                    "productos";
+                const sizes = (
+                    document.getElementById("sizes") as HTMLInputElement
+                ).value
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                const newFiles = Array.from(
+                    (document.getElementById("images") as HTMLInputElement)
+                        .files ?? [],
+                );
+
+                if (currentImages.length === 0 && newFiles.length === 0) {
+                    showStatus("El producto necesita al menos una imagen.");
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                const newImageUrls: string[] = [];
+
+                for (let i = 0; i < newFiles.length; i++) {
+                    const file = newFiles[i];
+                    showStatus(
+                        `Subiendo imagen ${i + 1}/${newFiles.length}...`,
+                    );
+
+                    const path = `${categorySlug}/${crypto.randomUUID()}-${file.name}`;
+                    const { error: uploadError } = await supabase.storage
+                        .from("product-images")
+                        .upload(path, file);
+
+                    if (uploadError) {
+                        showStatus(
+                            `Error subiendo imagen: ${uploadError.message}`,
+                        );
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const {
+                        data: { publicUrl },
+                    } = supabase.storage
+                        .from("product-images")
+                        .getPublicUrl(path);
+                    newImageUrls.push(publicUrl);
+                }
+
+                showStatus("Guardando cambios...");
+
+                const { error: updateError } = await supabase
+                    .from("products")
+                    .update({
+                        name,
+                        description,
+                        price,
+                        discount_percentage,
+                        category_id,
+                        sizes,
+                        image_urls: [...currentImages, ...newImageUrls],
+                    })
+                    .eq("id", productId);
+
+                if (updateError) {
+                    showStatus(
+                        `Error guardando producto: ${updateError.message}`,
+                    );
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                const pathsToRemove = removedImageUrls
+                    .map(storagePathFromUrl)
+                    .filter((p): p is string => Boolean(p));
+
+                if (pathsToRemove.length > 0) {
+                    await supabase.storage
+                        .from("product-images")
+                        .remove(pathsToRemove);
+                }
+
+                window.location.href = "/admin/products";
+            });
+        </script>
+    </body>
+</html>

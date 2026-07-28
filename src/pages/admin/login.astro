@@ -1,0 +1,120 @@
+---
+import "../../styles/global.css";
+---
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>Admin | Store 21</title>
+    </head>
+
+    <body
+        class="min-h-screen bg-black flex items-center justify-center px-6"
+    >
+        <div class="w-full max-w-sm">
+            <p
+                class="text-center font-['Anton'] uppercase tracking-wide text-2xl text-white mb-8"
+            >
+                Store 21 <span class="text-orange-500">Admin</span>
+            </p>
+
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label
+                        for="email"
+                        class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                        >Email</label
+                    >
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        autocomplete="username"
+                        class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                    />
+                </div>
+                <div>
+                    <label
+                        for="password"
+                        class="block text-xs uppercase tracking-wide text-white/50 mb-1"
+                        >Contraseña</label
+                    >
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        autocomplete="current-password"
+                        class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                    />
+                </div>
+
+                <p
+                    id="login-error"
+                    class="text-sm text-red-400 opacity-0 transition-opacity duration-300"
+                >
+                </p>
+
+                <button
+                    id="login-submit"
+                    type="submit"
+                    class="w-full bg-orange-600 text-white font-semibold py-3 rounded-full hover:bg-orange-500 transition-colors active:scale-[0.98] disabled:opacity-50"
+                >
+                    Ingresar
+                </button>
+            </form>
+        </div>
+
+        <script>
+            import { supabase } from "../../lib/supabaseClient";
+
+            const form = document.getElementById(
+                "login-form",
+            ) as HTMLFormElement;
+            const errorMessage = document.getElementById("login-error");
+            const submitButton = document.getElementById(
+                "login-submit",
+            ) as HTMLButtonElement;
+
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+            if (session) {
+                window.location.href = "/admin/products";
+            }
+
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+
+                const email = (
+                    document.getElementById("email") as HTMLInputElement
+                ).value.trim();
+                const password = (
+                    document.getElementById("password") as HTMLInputElement
+                ).value;
+
+                submitButton.disabled = true;
+                errorMessage?.classList.add("opacity-0");
+
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+
+                if (error) {
+                    submitButton.disabled = false;
+                    if (errorMessage) {
+                        errorMessage.textContent =
+                            "Credenciales inválidas. Intenta de nuevo.";
+                        errorMessage.classList.remove("opacity-0");
+                    }
+                    return;
+                }
+
+                window.location.href = "/admin/products";
+            });
+        </script>
+    </body>
+</html>
