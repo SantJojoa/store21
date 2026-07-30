@@ -20,7 +20,7 @@ const links = [
             id="menu-toggle"
             aria-label="Abrir menú"
             aria-expanded="false"
-            class="md:hidden relative h-6 w-6 text-white"
+            class="lg:hidden relative h-6 w-6 text-white"
         >
             <svg
                 id="icon-open"
@@ -53,13 +53,13 @@ const links = [
         </button>
 
         <!-- Izquierda: categorías, pegadas al borde (solo desktop) -->
-        <ul class="hidden md:flex gap-6 text-white/90 font-medium uppercase text-sm tracking-wide">
+        <ul class="hidden lg:flex gap-9 text-white/90 font-medium uppercase text-sm tracking-wide">
             {
                 links.map((link) => (
                     <li>
                         <a
                             href={link.href}
-                            class="relative pb-1 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-0 after:bg-orange-500 after:transition-all after:duration-300 hover:after:w-full"
+                            class="relative pb-1 hover:text-white transition-colors after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-0 after:bg-red-500 after:transition-all after:duration-300 hover:after:w-full"
                         >
                             {link.label}
                         </a>
@@ -132,7 +132,7 @@ const links = [
                 </button>
                 <span
                     id="cart-count"
-                    class="hidden absolute -top-2 -right-2 bg-orange-500 text-black text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full"
+                    class="hidden absolute -top-2 -right-2 bg-red-500 text-black text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full"
                 ></span>
             </div>
         </div>
@@ -141,7 +141,7 @@ const links = [
     <!-- Panel mobile -->
     <div
         id="mobile-menu"
-        class="hidden md:hidden border-t border-white/20 bg-black/80 backdrop-blur-md"
+        class="hidden lg:hidden border-t border-white/20 bg-black/80 backdrop-blur-md"
     >
         <ul class="flex flex-col divide-y divide-white/10">
             {
@@ -149,7 +149,7 @@ const links = [
                     <li>
                         <a
                             href={link.href}
-                            class="block px-6 py-4 text-white/90 uppercase text-sm tracking-wide hover:text-white hover:bg-white/5 border-l-2 border-transparent hover:border-orange-500 transition-colors"
+                            class="block px-6 py-4 text-white/90 uppercase text-sm tracking-wide hover:text-white hover:bg-white/5 border-l-2 border-transparent hover:border-red-500 transition-colors"
                         >
                             {link.label}
                         </a>
@@ -235,31 +235,31 @@ const links = [
                 id="shipping-name"
                 type="text"
                 placeholder="Nombre completo"
-                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-red-500"
             />
             <input
                 id="shipping-cc"
                 type="text"
                 placeholder="Cédula (CC)"
-                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-red-500"
             />
             <input
                 id="shipping-phone"
                 type="tel"
                 placeholder="Celular"
-                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-red-500"
             />
             <input
                 id="shipping-address"
                 type="text"
                 placeholder="Dirección exacta (indica si es oficina)"
-                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-red-500"
             />
             <input
                 id="shipping-city"
                 type="text"
                 placeholder="Ciudad"
-                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-orange-500"
+                class="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-red-500"
             />
             <p
                 id="shipping-feedback"
@@ -463,9 +463,9 @@ const links = [
             <p class="text-sm font-medium">${item.name}</p>
             <p class="text-xs text-white/50">Talla ${item.size} · ${formatPrice(item.price)}</p>
             <div class="mt-1 flex items-center gap-2">
-              <button data-action="decrease" data-index="${index}" class="h-6 w-6 border border-white/30 rounded text-xs hover:border-orange-500 transition-colors">-</button>
+              <button data-action="decrease" data-index="${index}" class="h-6 w-6 border border-white/30 rounded text-xs hover:border-red-500 transition-colors">-</button>
               <span class="text-xs w-4 text-center">${item.quantity}</span>
-              <button data-action="increase" data-index="${index}" class="h-6 w-6 border border-white/30 rounded text-xs hover:border-orange-500 transition-colors">+</button>
+              <button data-action="increase" data-index="${index}" class="h-6 w-6 border border-white/30 rounded text-xs hover:border-red-500 transition-colors">+</button>
             </div>
           </div>
           <button data-action="remove" data-index="${index}" class="text-white/40 hover:text-white text-sm">Quitar</button>
@@ -539,24 +539,26 @@ const links = [
         }
 
         const lines = cart.map(
-            (item) =>
-                `- ${item.name} (Talla ${item.size}) x${item.quantity} - ${formatPrice(item.price * item.quantity)}`,
+            (item, index) =>
+                `${index + 1}. ${item.name} (Talla ${item.size}) x${item.quantity} — ${formatPrice(item.price * item.quantity)}`,
         );
 
         const message = [
-            "Te hablo desde la pagina web",
-            "Quiero comprar",
+            "¡Hola! 👋 Vengo de la página web de *Store 21* y quiero hacer este pedido:",
             "",
+            "🛒 *Pedido*",
             ...lines,
             "",
-            `Total: ${formatPrice(getCartTotal(cart))}`,
+            `💰 *Total: ${formatPrice(getCartTotal(cart))}*`,
             "",
-            "Déjame datos de envío📦🇨🇴",
-            `🫵🏼Nombre: ${name}`,
-            `🪪CC: ${cc}`,
-            `📲Cel: ${phone}`,
-            `📍Dirección exacta (Poner si es oficina): ${address}`,
-            `🏙️Ciudad: ${city}`,
+            "📦 *Datos de envío*",
+            `🫵🏼 Nombre: ${name}`,
+            `🪪 Cédula: ${cc}`,
+            `📲 Celular: ${phone}`,
+            `📍 Dirección (indica si es oficina): ${address}`,
+            `🏙️ Ciudad: ${city}`,
+            "",
+            "Quedo atento/a para confirmar el pago y coordinar el envío 🙌",
         ].join("\n");
 
         const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;

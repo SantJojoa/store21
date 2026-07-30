@@ -20,7 +20,7 @@ import "../../../styles/global.css";
                 </h1>
                 <a
                     href="/admin/products/new"
-                    class="bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-orange-500 transition-colors"
+                    class="bg-red-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-red-500 transition-colors"
                 >
                     + Nuevo producto
                 </a>
@@ -127,7 +127,7 @@ import "../../../styles/global.css";
                         <td class="py-3 pr-4 text-white/70">${categoryLabel(product.category_id)}</td>
                         <td class="py-3 pr-4 text-white/70">${formatPrice(product.price)}</td>
                         <td class="py-3 pr-4 text-right whitespace-nowrap">
-                            <a href="/admin/products/${product.id}/edit" class="text-orange-500 hover:text-orange-400 text-sm mr-4">Editar</a>
+                            <a href="/admin/products/${product.id}/edit" class="text-red-500 hover:text-red-400 text-sm mr-4">Editar</a>
                             <button data-id="${product.id}" data-images='${JSON.stringify(product.image_urls ?? [])}' class="delete-btn text-red-400 hover:text-red-300 text-sm">Eliminar</button>
                         </td>
                     `;

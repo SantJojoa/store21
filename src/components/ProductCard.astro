@@ -29,7 +29,7 @@ const hasSecondImage = product.image_urls.length > 1;
 
 <a
     href={`/productos/${product.id}`}
-    class="group block rounded-md bg-white/10 backdrop-blur-md border border-white/10 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/50 active:scale-[0.98] active:duration-75"
+    class="group block rounded-md bg-white/10 backdrop-blur-md border border-white/10 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-red-500/50 active:scale-[0.98] active:duration-75"
 >
     <div class="relative aspect-square overflow-hidden rounded bg-white/5">
         <img
@@ -48,7 +48,7 @@ const hasSecondImage = product.image_urls.length > 1;
         }
         {
             hasDiscount && (
-                <span class="absolute top-2 left-2 -rotate-6 bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded shadow-[0_4px_10px_-2px_rgba(234,88,12,0.6)]">
+                <span class="absolute top-2 left-2 -rotate-6 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-[0_4px_10px_-2px_rgba(234,88,12,0.6)]">
                     -{product.discount_percentage}%
                 </span>
             )

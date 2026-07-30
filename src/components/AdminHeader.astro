@@ -12,18 +12,18 @@ const { active } = Astro.props;
     >
         <div class="flex items-center gap-8">
             <span class="font-['Anton'] uppercase tracking-wide text-white"
-                >Store 21 <span class="text-orange-500">Admin</span></span
+                >Store 21 <span class="text-red-500">Admin</span></span
             >
             <nav class="flex items-center gap-5 text-sm">
                 <a
                     href="/admin/products"
-                    class={`uppercase tracking-wide transition-colors ${active === "products" ? "text-orange-500" : "text-white/60 hover:text-white"}`}
+                    class={`uppercase tracking-wide transition-colors ${active === "products" ? "text-red-500" : "text-white/60 hover:text-white"}`}
                 >
                     Productos
                 </a>
                 <a
                     href="/admin/products/new"
-                    class={`uppercase tracking-wide transition-colors ${active === "new" ? "text-orange-500" : "text-white/60 hover:text-white"}`}
+                    class={`uppercase tracking-wide transition-colors ${active === "new" ? "text-red-500" : "text-white/60 hover:text-white"}`}
                 >
                     Nuevo producto
                 </a>
